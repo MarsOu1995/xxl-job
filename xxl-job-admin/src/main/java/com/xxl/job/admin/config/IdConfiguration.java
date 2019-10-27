@@ -20,8 +20,8 @@ import java.util.Map;
  * @author Mars
  * @date 2019/10/26
  */
-@Component
-@AutoConfigureBefore(XxlJobAdminConfig.class)
+//@Component
+//@AutoConfigureBefore(XxlJobAdminConfig.class)
 public class IdConfiguration implements InitializingBean {
 
     @Autowired
