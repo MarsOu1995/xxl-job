@@ -98,10 +98,10 @@ clearLog
         @}
         @if(clearBeforeNum > 0){
             AND id NOT in(
-                @if(db.type() == "mysql"){
+                @if(db.dbType() == "mysql"){
                     #use("mysqlCleanLog")#
                 @}
-                @if(db.type() == "oracle"){
+                @if(db.dbType() == "oracle"){
                     #use("oracleCleanLog")#
                 @}
                 
@@ -150,9 +150,9 @@ triggerCountByDay
         SUM(CASE WHEN handle_code = 200 then 1 else 0 end) as triggerDayCountSuc
     FROM (
         SELECT 
-            @if(db.type()=='oracle'){
+            @if(db.dbType()=='oracle'){
                 #use("oracleDate")#
-            @}else if(db.type()=='mysql'){
+            @}else if(db.dbType()=='mysql'){
                 #use("mysqlDate")#
             @}
             as triggerDay,handle_code,trigger_code

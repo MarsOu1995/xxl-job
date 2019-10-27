@@ -6,11 +6,11 @@ removeOld
                 SELECT id FROM xxl_job_logglue
                 WHERE job_id = #jobId#
                 ORDER BY update_time desc
-                 @if(db.type() == "mysql"){
+                 @if(db.dbType() == "mysql"){
                     LIMIT 0, #limit#
                 @}
             ) t1
-            @if(db.type() == "oracle"){
+            @if(db.dbType() == "oracle"){
                 where rownum <= #limit#
             @}
 		) AND job_id = #jobId#
