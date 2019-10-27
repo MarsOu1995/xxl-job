@@ -1,24 +1,28 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobLogGlue;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+import org.beetl.sql.core.annotatoin.Param;
+import org.beetl.sql.core.annotatoin.SqlResource;
+import org.beetl.sql.core.mapper.BaseMapper;
 
 import java.util.List;
 
 /**
  * job log for glue
- * @author xuxueli 2016-5-19 18:04:56
+ * @author Mars
+ * @date 2019/10/25
  */
-@Mapper
-public interface XxlJobLogGlueDao {
-	
-	public int save(XxlJobLogGlue xxlJobLogGlue);
-	
-	public List<XxlJobLogGlue> findByJobId(@Param("jobId") int jobId);
+@SqlResource("xxlJobLogglue")
+public interface XxlJobLogGlueDao extends BaseMapper<XxlJobLogGlue> {
 
-	public int removeOld(@Param("jobId") int jobId, @Param("limit") int limit);
+	default List<XxlJobLogGlue> findByJobId(long jobId) {
+        return createLambdaQuery().andEq(XxlJobLogGlue::getJobId, jobId).desc(XxlJobLogGlue::getId).select();
+    }
 
-	public int deleteByJobId(@Param("jobId") int jobId);
+	int removeOld(@Param("jobId") long jobId, @Param("limit") int limit);
+
+	default int deleteByJobId(long jobId) {
+		return createLambdaQuery().andEq(XxlJobLogGlue::getJobId, jobId).delete();
+	}
 	
 }

@@ -1,5 +1,6 @@
 package com.xxl.job.admin.controller;
 
+import com.xxl.job.admin.dao.XxlJobGroupDao;
 import com.xxl.job.admin.core.cron.CronExpression;
 import com.xxl.job.admin.core.exception.XxlJobException;
 import com.xxl.job.admin.core.model.XxlJobGroup;
@@ -9,7 +10,6 @@ import com.xxl.job.admin.core.route.ExecutorRouteStrategyEnum;
 import com.xxl.job.admin.core.thread.JobTriggerPoolHelper;
 import com.xxl.job.admin.core.trigger.TriggerTypeEnum;
 import com.xxl.job.admin.core.util.I18nUtil;
-import com.xxl.job.admin.dao.XxlJobGroupDao;
 import com.xxl.job.admin.service.LoginService;
 import com.xxl.job.admin.service.XxlJobService;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -41,7 +41,7 @@ public class JobInfoController {
 	private XxlJobService xxlJobService;
 	
 	@RequestMapping
-	public String index(HttpServletRequest request, Model model, @RequestParam(required = false, defaultValue = "-1") int jobGroup) {
+	public String index(HttpServletRequest request, Model model, @RequestParam(required = false, defaultValue = "-1") long jobGroup) {
 
 		// 枚举-字典
 		model.addAttribute("ExecutorRouteStrategyEnum", ExecutorRouteStrategyEnum.values());	    // 路由策略-列表
@@ -83,7 +83,7 @@ public class JobInfoController {
 		}
 		return jobGroupList;
 	}
-	public static void validPermission(HttpServletRequest request, int jobGroup) {
+	public static void validPermission(HttpServletRequest request, long jobGroup) {
 		XxlJobUser loginUser = (XxlJobUser) request.getAttribute(LoginService.LOGIN_IDENTITY_KEY);
 		if (!loginUser.validPermission(jobGroup)) {
 			throw new RuntimeException(I18nUtil.getString("system_permission_limit") + "[username="+ loginUser.getUsername() +"]");
@@ -113,26 +113,26 @@ public class JobInfoController {
 	
 	@RequestMapping("/remove")
 	@ResponseBody
-	public ReturnT<String> remove(int id) {
+	public ReturnT<String> remove(long id) {
 		return xxlJobService.remove(id);
 	}
 	
 	@RequestMapping("/stop")
 	@ResponseBody
-	public ReturnT<String> pause(int id) {
+	public ReturnT<String> pause(long id) {
 		return xxlJobService.stop(id);
 	}
 	
 	@RequestMapping("/start")
 	@ResponseBody
-	public ReturnT<String> start(int id) {
+	public ReturnT<String> start(long id) {
 		return xxlJobService.start(id);
 	}
 	
 	@RequestMapping("/trigger")
 	@ResponseBody
 	//@PermissionLimit(limit = false)
-	public ReturnT<String> triggerJob(int id, String executorParam) {
+	public ReturnT<String> triggerJob(long id, String executorParam) {
 		// force cover job param
 		if (executorParam == null) {
 			executorParam = "";

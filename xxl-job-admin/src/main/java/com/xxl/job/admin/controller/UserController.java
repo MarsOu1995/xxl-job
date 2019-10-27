@@ -1,13 +1,15 @@
 package com.xxl.job.admin.controller;
 
+import com.xxl.job.admin.beetl.utils.RowPageQuery;
+import com.xxl.job.admin.dao.XxlJobGroupDao;
+import com.xxl.job.admin.dao.XxlJobUserDao;
 import com.xxl.job.admin.controller.annotation.PermissionLimit;
 import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobUser;
 import com.xxl.job.admin.core.util.I18nUtil;
-import com.xxl.job.admin.dao.XxlJobGroupDao;
-import com.xxl.job.admin.dao.XxlJobUserDao;
 import com.xxl.job.admin.service.LoginService;
 import com.xxl.job.core.biz.model.ReturnT;
+import org.beetl.sql.core.engine.PageQuery;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.DigestUtils;
@@ -31,6 +33,7 @@ public class UserController {
 
     @Resource
     private XxlJobUserDao xxlJobUserDao;
+
     @Resource
     private XxlJobGroupDao xxlJobGroupDao;
 
@@ -53,8 +56,9 @@ public class UserController {
                                         String username, int role) {
 
         // page list
-        List<XxlJobUser> list = xxlJobUserDao.pageList(start, length, username, role);
-        int list_count = xxlJobUserDao.pageListCount(start, length, username, role);
+        PageQuery<XxlJobUser> xxlJobUserPageQuery = xxlJobUserDao.pageQuery(new RowPageQuery<>(start, length), username, role);
+        long list_count = xxlJobUserPageQuery.getTotalRow();
+        List<XxlJobUser> list = xxlJobUserPageQuery.getList();
 
         // package result
         Map<String, Object> maps = new HashMap<String, Object>();
@@ -95,7 +99,7 @@ public class UserController {
         }
 
         // write
-        xxlJobUserDao.save(xxlJobUser);
+        xxlJobUserDao.insert(xxlJobUser);
         return ReturnT.SUCCESS;
     }
 
@@ -130,7 +134,7 @@ public class UserController {
     @RequestMapping("/remove")
     @ResponseBody
     @PermissionLimit(adminuser = true)
-    public ReturnT<String> remove(HttpServletRequest request, int id) {
+    public ReturnT<String> remove(HttpServletRequest request, long id) {
 
         // avoid opt login seft
         XxlJobUser loginUser = (XxlJobUser) request.getAttribute(LoginService.LOGIN_IDENTITY_KEY);
@@ -138,7 +142,7 @@ public class UserController {
             return new ReturnT<String>(ReturnT.FAIL.getCode(), I18nUtil.getString("user_update_loginuser_limit"));
         }
 
-        xxlJobUserDao.delete(id);
+        xxlJobUserDao.deleteById(id);
         return ReturnT.SUCCESS;
     }
 

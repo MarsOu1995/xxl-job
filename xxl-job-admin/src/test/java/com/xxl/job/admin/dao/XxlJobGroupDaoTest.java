@@ -34,16 +34,16 @@ public class XxlJobGroupDaoTest {
 
         int ret = xxlJobGroupDao.save(group);
 
-        XxlJobGroup group2 = xxlJobGroupDao.load(group.getId());
+        XxlJobGroup group2 = xxlJobGroupDao.single(group.getId());
         group2.setAppName("setAppName2");
         group2.setTitle("setTitle2");
         group2.setOrder(2);
         group2.setAddressType(2);
         group2.setAddressList("setAddressList2");
 
-        int ret2 = xxlJobGroupDao.update(group2);
+        int ret2 = xxlJobGroupDao.updateById(group2);
 
-        int ret3 = xxlJobGroupDao.remove(group.getId());
+        int ret3 = xxlJobGroupDao.deleteById(group.getId());
     }
 
 }

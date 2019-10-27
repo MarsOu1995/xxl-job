@@ -1,26 +1,32 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobGroup;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+import org.beetl.sql.core.mapper.BaseMapper;
 
 import java.util.List;
 
 /**
- * Created by xuxueli on 16/9/30.
+ * XxlJobGroupDao
+ *
+ * @author Mars
+ * @date 2019/10/25
  */
-@Mapper
-public interface XxlJobGroupDao {
+public interface XxlJobGroupDao extends BaseMapper<XxlJobGroup> {
 
-    public List<XxlJobGroup> findAll();
+    default int save(XxlJobGroup xxlJobGroup) {
+        return createLambdaQuery().insert(xxlJobGroup);
+    }
 
-    public List<XxlJobGroup> findByAddressType(@Param("addressType") int addressType);
 
-    public int save(XxlJobGroup xxlJobGroup);
+    default List<XxlJobGroup> findAll() {
+        return createLambdaQuery().asc(XxlJobGroup::getOrder).select();
+    }
 
-    public int update(XxlJobGroup xxlJobGroup);
+    default List<XxlJobGroup> findByAddressType(int addressType) {
+        return createLambdaQuery().andEq(XxlJobGroup::getAddressType, addressType).asc(XxlJobGroup::getOrder).select();
+    }
 
-    public int remove(@Param("id") int id);
 
-    public XxlJobGroup load(@Param("id") int id);
+
+
 }

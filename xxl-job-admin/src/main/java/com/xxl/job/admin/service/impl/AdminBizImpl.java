@@ -1,14 +1,13 @@
 package com.xxl.job.admin.service.impl;
 
+import com.xxl.job.admin.dao.XxlJobInfoDao;
+import com.xxl.job.admin.dao.XxlJobLogDao;
+import com.xxl.job.admin.dao.XxlJobRegistryDao;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.model.XxlJobLog;
 import com.xxl.job.admin.core.thread.JobTriggerPoolHelper;
 import com.xxl.job.admin.core.trigger.TriggerTypeEnum;
 import com.xxl.job.admin.core.util.I18nUtil;
-import com.xxl.job.admin.dao.XxlJobGroupDao;
-import com.xxl.job.admin.dao.XxlJobInfoDao;
-import com.xxl.job.admin.dao.XxlJobLogDao;
-import com.xxl.job.admin.dao.XxlJobRegistryDao;
 import com.xxl.job.core.biz.AdminBiz;
 import com.xxl.job.core.biz.model.HandleCallbackParam;
 import com.xxl.job.core.biz.model.RegistryParam;
@@ -31,13 +30,13 @@ public class AdminBizImpl implements AdminBiz {
     private static Logger logger = LoggerFactory.getLogger(AdminBizImpl.class);
 
     @Resource
-    public XxlJobLogDao xxlJobLogDao;
-    @Resource
     private XxlJobInfoDao xxlJobInfoDao;
+
+    @Resource
+    private XxlJobLogDao xxlJobLogDao;
+
     @Resource
     private XxlJobRegistryDao xxlJobRegistryDao;
-    @Resource
-    private XxlJobGroupDao xxlJobGroupDao;
 
 
     @Override
@@ -53,7 +52,7 @@ public class AdminBizImpl implements AdminBiz {
 
     private ReturnT<String> callback(HandleCallbackParam handleCallbackParam) {
         // valid log item
-        XxlJobLog log = xxlJobLogDao.load(handleCallbackParam.getLogId());
+        XxlJobLog log = xxlJobLogDao.single(handleCallbackParam.getLogId());
         if (log == null) {
             return new ReturnT<String>(ReturnT.FAIL_CODE, "log item not found.");
         }
@@ -64,7 +63,7 @@ public class AdminBizImpl implements AdminBiz {
         // trigger success, to trigger child job
         String callbackMsg = null;
         if (IJobHandler.SUCCESS.getCode() == handleCallbackParam.getExecuteResult().getCode()) {
-            XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(log.getJobId());
+            XxlJobInfo xxlJobInfo = xxlJobInfoDao.single(log.getJobId());
             if (xxlJobInfo!=null && xxlJobInfo.getChildJobId()!=null && xxlJobInfo.getChildJobId().trim().length()>0) {
                 callbackMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_trigger_child_run") +"<<<<<<<<<<< </span><br>";
 

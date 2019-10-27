@@ -1,33 +1,65 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobRegistry;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+import org.beetl.sql.core.mapper.BaseMapper;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
- * Created by xuxueli on 16/9/30.
+ * XxlJobRegistryBeetDao
+ *
+ * @author Mars
+ * @date 2019/10/25
  */
-@Mapper
-public interface XxlJobRegistryDao {
+public interface XxlJobRegistryDao extends BaseMapper<XxlJobRegistry> {
+    default List<Long> findDead(int timeout) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.SECOND,-timeout);
+        return createLambdaQuery()
+                .andLess(XxlJobRegistry::getUpdateTime, calendar.getTime())
+                .select(Long.class, "id");
+    }
 
-    public List<Integer> findDead(@Param("timeout") int timeout);
+    default int removeDead(List<Long> ids) {
+        return createLambdaQuery().andIn(XxlJobRegistry::getId, ids).delete();
+    }
 
-    public int removeDead(@Param("ids") List<Integer> ids);
+    default List<XxlJobRegistry> findAll(int timeout) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.SECOND,-timeout);
+        return createLambdaQuery().andGreat(XxlJobRegistry::getUpdateTime, calendar.getTime()).select();
+    }
 
-    public List<XxlJobRegistry> findAll(@Param("timeout") int timeout);
+    default int registryUpdate(String registryGroup, String registryKey, String registryValue) {
 
-    public int registryUpdate(@Param("registryGroup") String registryGroup,
-                              @Param("registryKey") String registryKey,
-                              @Param("registryValue") String registryValue);
+        return createLambdaQuery().andEq(XxlJobRegistry::getRegistryGroup, registryGroup)
+                .andEq(XxlJobRegistry::getRegistryKey, registryKey)
+                .andEq(XxlJobRegistry::getRegistryValue, registryValue)
+                .updateSelective(new XxlJobRegistry());
+    }
 
-    public int registrySave(@Param("registryGroup") String registryGroup,
-                            @Param("registryKey") String registryKey,
-                            @Param("registryValue") String registryValue);
+    default int registrySave(String registryGroup, String registryKey, String registryValue) {
+        XxlJobRegistry xxlJobRegistry = new XxlJobRegistry();
+        xxlJobRegistry.setRegistryGroup(registryGroup);
+        xxlJobRegistry.setRegistryKey(registryKey);
+        xxlJobRegistry.setRegistryValue(registryValue);
+        return createLambdaQuery().insert(xxlJobRegistry);
+    }
 
-    public int registryDelete(@Param("registryGroup") String registGroup,
-                          @Param("registryKey") String registryKey,
-                          @Param("registryValue") String registryValue);
+    default int registryDelete(String registryGroup, String registryKey, String registryValue) {
+        return createLambdaQuery().andEq(XxlJobRegistry::getRegistryGroup, registryGroup)
+                .andEq(XxlJobRegistry::getRegistryKey, registryKey)
+                .andEq(XxlJobRegistry::getRegistryValue, registryValue)
+                .delete();
+    }
+
+
+
+
 
 }
+

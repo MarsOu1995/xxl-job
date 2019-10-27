@@ -1,6 +1,8 @@
 package com.xxl.job.admin.dao;
 
+import com.xxl.job.admin.beetl.utils.RowPageQuery;
 import com.xxl.job.admin.core.model.XxlJobInfo;
+import org.beetl.sql.core.engine.PageQuery;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,9 +23,10 @@ public class XxlJobInfoDaoTest {
 	
 	@Test
 	public void pageList(){
-		List<XxlJobInfo> list = xxlJobInfoDao.pageList(0, 20, 0, -1, null, null, null);
-		int list_count = xxlJobInfoDao.pageListCount(0, 20, 0, -1, null, null, null);
-		
+		PageQuery<XxlJobInfo> xxlJobInfoPageQuery = xxlJobInfoDao.pageQuery(new RowPageQuery<>(0, 20), 0, -1, null, null, null);
+		long list_count = xxlJobInfoPageQuery.getTotalRow();
+		List<XxlJobInfo> list = xxlJobInfoPageQuery.getList();
+
 		System.out.println(list);
 		System.out.println(list_count);
 
@@ -33,7 +36,7 @@ public class XxlJobInfoDaoTest {
 	@Test
 	public void save_load(){
 		XxlJobInfo info = new XxlJobInfo();
-		info.setJobGroup(1);
+		info.setJobGroup(1L);
 		info.setJobCron("jobCron");
 		info.setJobDesc("desc");
 		info.setAuthor("setAuthor");
@@ -47,9 +50,9 @@ public class XxlJobInfoDaoTest {
 		info.setGlueRemark("setGlueRemark");
 		info.setChildJobId("1");
 
-		int count = xxlJobInfoDao.save(info);
+		int count = xxlJobInfoDao.createLambdaQuery().insert(info);
 
-		XxlJobInfo info2 = xxlJobInfoDao.loadById(info.getId());
+		XxlJobInfo info2 = xxlJobInfoDao.single(info.getId());
 		info2.setJobCron("jobCron2");
 		info2.setJobDesc("desc2");
 		info2.setAuthor("setAuthor2");
@@ -64,13 +67,13 @@ public class XxlJobInfoDaoTest {
 		info2.setGlueUpdatetime(new Date());
 		info2.setChildJobId("1");
 
-		int item2 = xxlJobInfoDao.update(info2);
+		int item2 = xxlJobInfoDao.updateById(info2);
 
-		xxlJobInfoDao.delete(info2.getId());
+		xxlJobInfoDao.deleteById(info2.getId());
 
 		List<XxlJobInfo> list2 = xxlJobInfoDao.getJobsByGroup(1);
 
-		int ret3 = xxlJobInfoDao.findAllCount();
+		long ret3 = xxlJobInfoDao.allCount();
 
 	}
 

@@ -1,49 +1,66 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobInfo;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+import com.xxl.job.admin.beetl.utils.CustomCondition;
+import com.xxl.job.admin.beetl.utils.CustomQuery;
+import org.beetl.sql.core.engine.PageQuery;
+import org.beetl.sql.core.mapper.BaseMapper;
+import org.beetl.sql.core.query.Query;
 
 import java.util.List;
 
-
 /**
- * job info
- * @author xuxueli 2016-1-12 18:03:45
+ * 任务信息
+ *
+ * @author Mars
+ * @date 2019/10/23
  */
-@Mapper
-public interface XxlJobInfoDao {
+public interface XxlJobInfoDao extends BaseMapper<XxlJobInfo> {
 
-	public List<XxlJobInfo> pageList(@Param("offset") int offset,
-									 @Param("pagesize") int pagesize,
-									 @Param("jobGroup") int jobGroup,
-									 @Param("triggerStatus") int triggerStatus,
-									 @Param("jobDesc") String jobDesc,
-									 @Param("executorHandler") String executorHandler,
-									 @Param("author") String author);
-	public int pageListCount(@Param("offset") int offset,
-							 @Param("pagesize") int pagesize,
-							 @Param("jobGroup") int jobGroup,
-							 @Param("triggerStatus") int triggerStatus,
-							 @Param("jobDesc") String jobDesc,
-							 @Param("executorHandler") String executorHandler,
-							 @Param("author") String author);
-	
-	public int save(XxlJobInfo info);
+    /**
+     * 分页查询
+     * @param pageQuery
+     * @param jobGroup
+     * @param triggerStatus
+     * @param jobDesc
+     * @param executorHandler
+     * @param author
+     * @return
+     */
+    default PageQuery<XxlJobInfo> pageQuery(PageQuery<XxlJobInfo> pageQuery, long jobGroup, int triggerStatus, String jobDesc, String executorHandler, String author) {
+        return createLambdaQuery().andEq(XxlJobInfo::getJobGroup, CustomQuery.conditionNumber(jobGroup, CustomCondition.GT, 0))
+                .andEq(XxlJobInfo::getTriggerStatus, CustomQuery.conditionNumber(triggerStatus, CustomCondition.GTE, 0))
+                .andLike(XxlJobInfo::getJobDesc, CustomQuery.filterLikeEmpty(jobDesc))
+                .andLike(XxlJobInfo::getExecutorHandler, CustomQuery.filterLikeEmpty(executorHandler))
+                .andLike(XxlJobInfo::getAuthor, CustomQuery.filterLikeEmpty(author))
+                .page(pageQuery.getPageNumber(),pageQuery.getPageSize());
+    }
 
-	public XxlJobInfo loadById(@Param("id") int id);
-	
-	public int update(XxlJobInfo xxlJobInfo);
-	
-	public int delete(@Param("id") long id);
+    default long countByJobGroup(long jobGroup) {
+        return createLambdaQuery().andEq(XxlJobInfo::getJobGroup, jobGroup)
+                .count();
 
-	public List<XxlJobInfo> getJobsByGroup(@Param("jobGroup") int jobGroup);
+    }
 
-	public int findAllCount();
+    /**
+     * 根据jobGroup获取任务信息
+     * @param jobGroup
+     * @return
+     */
+    default List<XxlJobInfo> getJobsByGroup(long jobGroup) {
+        return createLambdaQuery().andEq(XxlJobInfo::getJobGroup, jobGroup).select();
+    }
 
-	public List<XxlJobInfo> scheduleJobQuery(@Param("maxNextTime") long maxNextTime);
 
-	public int scheduleUpdate(XxlJobInfo xxlJobInfo);
+    default List<XxlJobInfo> scheduleJobQuery(long maxNextTime) {
+        return createLambdaQuery().andEq(XxlJobInfo::getTriggerStatus, 1).andLessEq(XxlJobInfo::getTriggerNextTime,maxNextTime).select();
+    }
+
+    default int scheduleUpdate(XxlJobInfo xxlJobInfo) {
+        return createLambdaQuery().andEq(XxlJobInfo::getId, xxlJobInfo.getId()).update(xxlJobInfo);
+
+    }
+
 
 
 }

@@ -1,17 +1,17 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobLog;
+import com.xxl.job.admin.core.model.result.TriggerCountByDay;
+import com.xxl.job.admin.beetl.utils.RowPageQuery;
+import org.beetl.sql.core.engine.PageQuery;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -22,15 +22,16 @@ public class XxlJobLogDaoTest {
 
     @Test
     public void test(){
-        List<XxlJobLog> list = xxlJobLogDao.pageList(0, 10, 1, 1, null, null, 1);
-        int list_count = xxlJobLogDao.pageListCount(0, 10, 1, 1, null, null, 1);
+        PageQuery<XxlJobLog> xxlJobLogPageQuery = xxlJobLogDao.pageList(new RowPageQuery(0,10), 1, 1, null, null, 1);
+        List<XxlJobLog> list = xxlJobLogPageQuery.getList();
+        long list_count = xxlJobLogPageQuery.getTotalRow();
 
         XxlJobLog log = new XxlJobLog();
-        log.setJobGroup(1);
-        log.setJobId(1);
+        log.setJobGroup(1L);
+        log.setJobId(1L);
 
-        long ret1 = xxlJobLogDao.save(log);
-        XxlJobLog dto = xxlJobLogDao.load(log.getId());
+        long ret1 = xxlJobLogDao.createLambdaQuery().insert(log);
+        XxlJobLog dto = xxlJobLogDao.single(log.getId());
 
         log.setTriggerTime(new Date());
         log.setTriggerCode(1);
@@ -39,23 +40,23 @@ public class XxlJobLogDaoTest {
         log.setExecutorHandler("1");
         log.setExecutorParam("1");
         ret1 = xxlJobLogDao.updateTriggerInfo(log);
-        dto = xxlJobLogDao.load(log.getId());
+        dto = xxlJobLogDao.single(log.getId());
 
 
         log.setHandleTime(new Date());
         log.setHandleCode(2);
         log.setHandleMsg("2");
         ret1 = xxlJobLogDao.updateHandleInfo(log);
-        dto = xxlJobLogDao.load(log.getId());
+        dto = xxlJobLogDao.single(log.getId());
 
 
-        List<Map<String, Object>> list2 = xxlJobLogDao.triggerCountByDay(new Date(new Date().getTime() + 30*24*60*60*1000), new Date());
+        List<TriggerCountByDay> list2 = xxlJobLogDao.triggerCountByDay(new Date(new Date().getTime() + 30*24*60*60*1000), new Date());
 
         int ret4 = xxlJobLogDao.clearLog(1, 1, new Date(), 100);
 
-        int ret2 = xxlJobLogDao.delete(log.getJobId());
+        int ret2 = xxlJobLogDao.deleteById(log.getJobId());
 
-        int ret3 = xxlJobLogDao.triggerCountByHandleCode(-1);
+        long ret3 = xxlJobLogDao.triggerCountByHandleCode(-1);
     }
 
 }

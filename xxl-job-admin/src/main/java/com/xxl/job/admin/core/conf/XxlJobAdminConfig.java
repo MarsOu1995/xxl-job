@@ -7,6 +7,7 @@ import com.xxl.job.admin.dao.XxlJobRegistryDao;
 import com.xxl.job.core.biz.AdminBiz;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
@@ -41,11 +42,10 @@ public class XxlJobAdminConfig implements InitializingBean{
     private String emailUserName;
 
     // dao, service
-
     @Resource
     private XxlJobLogDao xxlJobLogDao;
     @Resource
-    private XxlJobInfoDao xxlJobInfoDao;
+    private XxlJobInfoDao XxlJobInfoDao;
     @Resource
     private XxlJobRegistryDao xxlJobRegistryDao;
     @Resource
@@ -75,7 +75,7 @@ public class XxlJobAdminConfig implements InitializingBean{
     }
 
     public XxlJobInfoDao getXxlJobInfoDao() {
-        return xxlJobInfoDao;
+        return XxlJobInfoDao;
     }
 
     public XxlJobRegistryDao getXxlJobRegistryDao() {

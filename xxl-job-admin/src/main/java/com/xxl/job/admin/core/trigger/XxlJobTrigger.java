@@ -38,9 +38,9 @@ public class XxlJobTrigger {
      *          null: use job param
      *          not null: cover job param
      */
-    public static void trigger(int jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam, String executorParam) {
+    public static void trigger(long jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam, String executorParam) {
         // load data
-        XxlJobInfo jobInfo = XxlJobAdminConfig.getAdminConfig().getXxlJobInfoDao().loadById(jobId);
+        XxlJobInfo jobInfo = XxlJobAdminConfig.getAdminConfig().getXxlJobInfoDao().single(jobId);
         if (jobInfo == null) {
             logger.warn(">>>>>>>>>>>> trigger fail, jobId invalid，jobId={}", jobId);
             return;
@@ -49,7 +49,7 @@ public class XxlJobTrigger {
             jobInfo.setExecutorParam(executorParam);
         }
         int finalFailRetryCount = failRetryCount>=0?failRetryCount:jobInfo.getExecutorFailRetryCount();
-        XxlJobGroup group = XxlJobAdminConfig.getAdminConfig().getXxlJobGroupDao().load(jobInfo.getJobGroup());
+        XxlJobGroup group = XxlJobAdminConfig.getAdminConfig().getXxlJobGroupDao().single(jobInfo.getJobGroup());
 
         // sharding param
         int[] shardingParam = null;
@@ -105,7 +105,7 @@ public class XxlJobTrigger {
         jobLog.setJobGroup(jobInfo.getJobGroup());
         jobLog.setJobId(jobInfo.getId());
         jobLog.setTriggerTime(new Date());
-        XxlJobAdminConfig.getAdminConfig().getXxlJobLogDao().save(jobLog);
+        XxlJobAdminConfig.getAdminConfig().getXxlJobLogDao().insert(jobLog,true);
         logger.debug(">>>>>>>>>>> xxl-job trigger start, jobId:{}", jobLog.getId());
 
         // 2、init trigger-param

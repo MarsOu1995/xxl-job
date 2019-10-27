@@ -1,13 +1,16 @@
 package com.xxl.job.admin.controller;
 
-import com.xxl.job.admin.core.model.XxlJobGroup;
-import com.xxl.job.admin.core.model.XxlJobRegistry;
-import com.xxl.job.admin.core.util.I18nUtil;
+import com.xxl.job.admin.beetl.utils.RowPageQuery;
+import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.dao.XxlJobGroupDao;
 import com.xxl.job.admin.dao.XxlJobInfoDao;
 import com.xxl.job.admin.dao.XxlJobRegistryDao;
+import com.xxl.job.admin.core.model.XxlJobGroup;
+import com.xxl.job.admin.core.model.XxlJobRegistry;
+import com.xxl.job.admin.core.util.I18nUtil;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.RegistryConfig;
+import org.beetl.sql.core.engine.PageQuery;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,9 +31,11 @@ import java.util.List;
 public class JobGroupController {
 
 	@Resource
-	public XxlJobInfoDao xxlJobInfoDao;
+	private XxlJobInfoDao xxlJobInfoDao;
+
 	@Resource
-	public XxlJobGroupDao xxlJobGroupDao;
+	private XxlJobGroupDao xxlJobGroupDao;
+
 	@Resource
 	private XxlJobRegistryDao xxlJobRegistryDao;
 
@@ -113,7 +118,7 @@ public class JobGroupController {
 			}
 		}
 
-		int ret = xxlJobGroupDao.update(xxlJobGroup);
+		int ret = xxlJobGroupDao.updateById(xxlJobGroup);
 		return (ret>0)?ReturnT.SUCCESS:ReturnT.FAIL;
 	}
 
@@ -141,10 +146,10 @@ public class JobGroupController {
 
 	@RequestMapping("/remove")
 	@ResponseBody
-	public ReturnT<String> remove(int id){
+	public ReturnT<String> remove(long id){
 
 		// valid
-		int count = xxlJobInfoDao.pageListCount(0, 10, id, -1,  null, null, null);
+		long count = xxlJobInfoDao.countByJobGroup(id);
 		if (count > 0) {
 			return new ReturnT<String>(500, I18nUtil.getString("jobgroup_del_limit_0") );
 		}
@@ -154,14 +159,14 @@ public class JobGroupController {
 			return new ReturnT<String>(500, I18nUtil.getString("jobgroup_del_limit_1") );
 		}
 
-		int ret = xxlJobGroupDao.remove(id);
+		int ret = xxlJobGroupDao.deleteById(id);
 		return (ret>0)?ReturnT.SUCCESS:ReturnT.FAIL;
 	}
 
 	@RequestMapping("/loadById")
 	@ResponseBody
-	public ReturnT<XxlJobGroup> loadById(int id){
-		XxlJobGroup jobGroup = xxlJobGroupDao.load(id);
+	public ReturnT<XxlJobGroup> loadById(long id){
+		XxlJobGroup jobGroup = xxlJobGroupDao.single(id);
 		return jobGroup!=null?new ReturnT<XxlJobGroup>(jobGroup):new ReturnT<XxlJobGroup>(ReturnT.FAIL_CODE, null);
 	}
 

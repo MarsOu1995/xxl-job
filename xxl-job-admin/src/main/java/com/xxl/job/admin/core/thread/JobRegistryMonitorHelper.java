@@ -38,7 +38,7 @@ public class JobRegistryMonitorHelper {
 						if (groupList!=null && !groupList.isEmpty()) {
 
 							// remove dead address (admin/executor)
-							List<Integer> ids = XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().findDead(RegistryConfig.DEAD_TIMEOUT);
+							List<Long> ids = XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().findDead(RegistryConfig.DEAD_TIMEOUT);
 							if (ids!=null && ids.size()>0) {
 								XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().removeDead(ids);
 							}
@@ -76,7 +76,7 @@ public class JobRegistryMonitorHelper {
 									addressListStr = addressListStr.substring(0, addressListStr.length()-1);
 								}
 								group.setAddressList(addressListStr);
-								XxlJobAdminConfig.getAdminConfig().getXxlJobGroupDao().update(group);
+								XxlJobAdminConfig.getAdminConfig().getXxlJobGroupDao().updateById(group);
 							}
 						}
 					} catch (Exception e) {

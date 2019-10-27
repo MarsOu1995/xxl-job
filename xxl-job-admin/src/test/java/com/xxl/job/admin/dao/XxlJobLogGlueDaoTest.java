@@ -1,12 +1,9 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobLogGlue;
-import com.xxl.job.admin.dao.XxlJobLogGlueDao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
@@ -22,11 +19,11 @@ public class XxlJobLogGlueDaoTest {
     @Test
     public void test(){
         XxlJobLogGlue logGlue = new XxlJobLogGlue();
-        logGlue.setJobId(1);
+        logGlue.setJobId(1L);
         logGlue.setGlueType("1");
         logGlue.setGlueSource("1");
         logGlue.setGlueRemark("1");
-        int ret = xxlJobLogGlueDao.save(logGlue);
+        int ret = xxlJobLogGlueDao.createLambdaQuery().insert(logGlue);
 
         List<XxlJobLogGlue> list = xxlJobLogGlueDao.findByJobId(1);
 

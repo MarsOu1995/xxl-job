@@ -1,31 +1,47 @@
 package com.xxl.job.admin.dao;
 
 import com.xxl.job.admin.core.model.XxlJobUser;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+import com.xxl.job.admin.beetl.utils.CustomCondition;
+import com.xxl.job.admin.beetl.utils.CustomQuery;
+import org.beetl.sql.core.engine.PageQuery;
+import org.beetl.sql.core.mapper.BaseMapper;
+import org.beetl.sql.core.query.LambdaQuery;
+
 import java.util.List;
 
 /**
- * @author xuxueli 2019-05-04 16:44:59
+ * 用户管理
+ *
+ * @author Mars
+ * @date 2019/10/22
  */
-@Mapper
-public interface XxlJobUserDao {
+public interface XxlJobUserDao extends BaseMapper<XxlJobUser> {
 
-	public List<XxlJobUser> pageList(@Param("offset") int offset,
-                                     @Param("pagesize") int pagesize,
-                                     @Param("username") String username,
-									 @Param("role") int role);
-	public int pageListCount(@Param("offset") int offset,
-							 @Param("pagesize") int pagesize,
-							 @Param("username") String username,
-							 @Param("role") int role);
+    /**
+     * 分页查询
+     * @param pageQuery
+     * @param username
+     * @param role
+     * @return
+     */
+    default PageQuery<XxlJobUser> pageQuery(PageQuery<XxlJobUser> pageQuery, String username, int role) {
+        return createLambdaQuery().andLike(XxlJobUser::getUsername, CustomQuery.filterLikeEmpty(username))
+                .andEq(XxlJobUser::getRole, CustomQuery.conditionNumber(role, CustomCondition.GT, -1))
+                .page(pageQuery.getPageNumber(),pageQuery.getPageSize());
+    }
 
-	public XxlJobUser loadByUserName(@Param("username") String username);
+    /**
+     * 根据用户名读取用户信息
+     * @param username
+     * @return
+     */
+    default XxlJobUser loadByUserName(String username){
+        LambdaQuery<XxlJobUser> lambdaQuery = createLambdaQuery();
+        XxlJobUser xxlJobUser = lambdaQuery.andEq(XxlJobUser::getUsername, username).single();
+        return xxlJobUser;
+    }
 
-	public int save(XxlJobUser xxlJobUser);
-
-	public int update(XxlJobUser xxlJobUser);
-	
-	public int delete(@Param("id") int id);
-
+    default int update(XxlJobUser xxlJobUser) {
+        return createLambdaQuery().andEq(XxlJobUser::getId, xxlJobUser.getId()).updateSelective(xxlJobUser);
+    }
 }
