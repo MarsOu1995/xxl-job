@@ -20,7 +20,7 @@ beetlsql.sqlPath=/beetl-sql
 2.改造说明
 ======
 
-+ jdk改为1.8，现在只支持1.8以上，因为用到了函数式变成
++ jdk改为1.8，现在只支持1.8以上，因为用到了函数式编程
 + 去除Mybatis作为持久层框架，换成Beetlsql
 + 连接池使用HirkariCp
 + 兼容mysql和oracle，已测试，切换后功能无问题
