@@ -106,4 +106,4 @@ oracleCleanLog
 ```
 此sql目前只做了mysql和oracle的兼容，根据#db.dbType()#获取当前数据库类型，然后#use("XXX")#选择对应sql片段拼接。
 若是需要再做其他数据库兼容，只需改动/beetl-sql下2个文件，检查其中的sql是否满足所换的数据库既可。
-（需要改动的sql不会很多，就两条:xxlJobLog.clearLog和xxlJobLogglue.removeOld）
+（需要改动的sql不会很多，就只有xxlJobLog.clearLog这个sql需要注意一下）

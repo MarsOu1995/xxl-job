@@ -19,7 +19,10 @@ public interface XxlJobLogGlueDao extends BaseMapper<XxlJobLogGlue> {
         return createLambdaQuery().andEq(XxlJobLogGlue::getJobId, jobId).desc(XxlJobLogGlue::getId).select();
     }
 
-	int removeOld(@Param("jobId") long jobId, @Param("limit") int limit);
+	default int removeOld(@Param("jobId") long jobId, @Param("limit") int limit) {
+		List<Long> ids = createLambdaQuery().andEq(XxlJobLogGlue::getJobId, jobId).desc(XxlJobLogGlue::getUpdateTime).limit(1,limit).select(Long.class, "id");
+		return createLambdaQuery().andNotIn(XxlJobLogGlue::getId, ids).andEq(XxlJobLogGlue::getJobId, jobId).delete();
+	}
 
 	default int deleteByJobId(long jobId) {
 		return createLambdaQuery().andEq(XxlJobLogGlue::getJobId, jobId).delete();
