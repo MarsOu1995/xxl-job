@@ -43,7 +43,7 @@ public interface XxlJobLogDao extends BaseMapper<XxlJobLog> {
 }
 
 ```
-@sqlResource中的值就是指向resources/beetl-sql/下的xxlJobLig.md
+@sqlResource中的值就是指向resources/beetl-sql/下的xxlJobLog.md
 接口法与sql.md中的标题名一致,如下clearLog：
 
 ```markdown
